@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+  <!-- Contains start/stop button and sensor reading details -->
+  <LinearLayout 
+      android:orientation="vertical"
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent">
+
+    <!-- Start Light sampling Button -->
+    <Button
+        android:id="@+id/PA1Activity_Button_StartLight"
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Start Light sampling" />
+
+    <!-- Stop Light sampling Button -->
+    <Button
+        android:id="@+id/PA1Activity_Button_StopLight"
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Stop Light sampling" />
+
+    <!-- Light sensor Readings -->
+
+    <TextView
+        android:id="@+id/PA1Activity_TextView_Light"
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content" 
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="" />
+
+    <TextView
+        android:text="Location not yet determined..."
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/PA1Activity_TextView_Location" />
+
+    <TextView
+        android:text=""
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/PA1Activity_TextView_LatLong" />
+
+    <Button
+        android:text="Flush Logs"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/PA1Activity_Button_FlushLog" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/LogText" />
+
+  </LinearLayout>
+
+</ScrollView>
