@@ -128,7 +128,7 @@ public class LightAnalyzerActivity
             createToast ( "Unable to start light sampling: " + e.toString() );
         }
     }
-
+    /*Starts location sampling and turns on GPS*/
     private void startLocationSampling(){
         try {
             if(isLocationSamplingOn){
@@ -150,7 +150,7 @@ public class LightAnalyzerActivity
             createToast ( "Unable to start location sampling: " + e.toString() );
         }
     }
-
+    /*Stops location sampling and turn off GPS.*/
     private void stopLocationSampling() {
         try {
             if(!isLocationSamplingOn){
@@ -197,6 +197,8 @@ public class LightAnalyzerActivity
             lightSensor = null;
         }
     }
+
+    /*Following 3 are stub methods that needs to be added*/
     public void onStatusChanged(String provider, int status, Bundle extras){
 
     }
@@ -206,6 +208,7 @@ public class LightAnalyzerActivity
     public void onProviderEnabled(String s) {
 
     }
+    /*This method is called whenever the GPS sensor detects a change in location*/
     public void onLocationChanged(Location loc){
         double lat = loc.getLatitude();
         double lon = loc.getLongitude();
@@ -332,6 +335,7 @@ public class LightAnalyzerActivity
                 }
             } );
     }
+    /*Helper method to actually set the text on screen*/
     private void updateLocationTextView( final String s){
         handler.post(new Runnable(){
             @Override
@@ -340,6 +344,8 @@ public class LightAnalyzerActivity
             }
         });
     }
+
+    /*Helper method to update location text on screen, if any. */
     private void updateLatLongTextView(double lat, double lon, boolean shouldDisplay){
         if(shouldDisplay) {
             final StringBuilder sb = new StringBuilder();
@@ -362,6 +368,7 @@ public class LightAnalyzerActivity
             });
         }
     }
+    /*Method to update screen on current detected location, and also toggle location sampling*/
     private void updateLocation(double val) {
         if(val > LIGHT_CUTTOFF){
             updateLocationTextView("Outdoor:");
@@ -455,7 +462,8 @@ public class LightAnalyzerActivity
         SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd-h-mm-ssa" );
         return sdf.format( new Date( unixTime ) );
     }
-    /** Utility class that calculates the exponential moving average of lux value, given current value. **/
+    /** Utility class that calculates the exponential moving average of lux value,
+     * given current value.**/
     class ExponentialMovingAverage {
         private double alpha;
         private Double oldValue;
@@ -474,6 +482,8 @@ public class LightAnalyzerActivity
         }
     }
 
+    /** Threshold value to determine if phone is currently indoor or outdoor based on
+     * light intensity**/
     private int LIGHT_CUTTOFF = 2000;
     /** Start light sensor sampling button. */
     private Button startLightButton;
