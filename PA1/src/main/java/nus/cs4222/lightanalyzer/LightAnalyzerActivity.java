@@ -363,7 +363,7 @@ public class LightAnalyzerActivity
         }
     }
     private void updateLocation(double val) {
-        if(val > 1000){
+        if(val > LIGHT_CUTTOFF){
             updateLocationTextView("Outdoor:");
             startLocationSampling();
 
@@ -474,6 +474,7 @@ public class LightAnalyzerActivity
         }
     }
 
+    private int LIGHT_CUTTOFF = 2000;
     /** Start light sensor sampling button. */
     private Button startLightButton;
     /** Stop light sensor sampling button. */
