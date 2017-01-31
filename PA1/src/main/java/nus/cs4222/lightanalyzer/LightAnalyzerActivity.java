@@ -357,7 +357,7 @@ public class LightAnalyzerActivity
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    latLongTextView.setText("GPS is Off.");
+                    latLongTextView.setText("GPS is Off or location still unknown.");
                 }
             });
         }
