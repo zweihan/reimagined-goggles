@@ -5,6 +5,7 @@ import java.util.*;
 import java.text.*;
 
 import android.app.*;
+import android.graphics.Color;
 import android.os.*;
 import android.widget.*;
 import android.view.*;
@@ -336,13 +337,24 @@ public class LightAnalyzerActivity
             } );
     }
     /*Helper method to actually set the text on screen*/
-    private void updateLocationTextView( final String s){
-        handler.post(new Runnable(){
-            @Override
-            public void run(){
-                locationTextView.setText(s);
-            }
-        });
+    private void updateLocationTextView( boolean outdoors){
+        if (outdoors) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    locationTextView.setText("Outdoors:");
+                    locationTextView.setTextColor(Color.GREEN);
+                }
+            });
+        } else {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    locationTextView.setText("Indoors");
+                    locationTextView.setTextColor(Color.RED);
+                }
+            });
+        }
     }
 
     /*Helper method to update location text on screen, if any. */
@@ -351,7 +363,7 @@ public class LightAnalyzerActivity
             final StringBuilder sb = new StringBuilder();
             sb.append("Latitude: ");
             sb.append(lat);
-            sb.append(", Longtitude: ");
+            sb.append(",\nLongtitude: ");
             sb.append(lon);
             handler.post(new Runnable() {
                 @Override
@@ -371,11 +383,11 @@ public class LightAnalyzerActivity
     /*Method to update screen on current detected location, and also toggle location sampling*/
     private void updateLocation(double val) {
         if(val > LIGHT_CUTOFF){
-            updateLocationTextView("Outdoor:");
+            updateLocationTextView(true);
             startLocationSampling();
 
         }else{
-            updateLocationTextView("Indoor:");
+            updateLocationTextView(false);
             stopLocationSampling();
         }
     }
@@ -484,7 +496,7 @@ public class LightAnalyzerActivity
 
     /** Threshold value to determine if phone is currently indoor or outdoor based on
      * light intensity**/
-    private int LIGHT_CUTOFF = 2000;
+    private int LIGHT_CUTOFF = 10;
     /** Start light sensor sampling button. */
     private Button startLightButton;
     /** Stop light sensor sampling button. */
