@@ -496,7 +496,7 @@ public class LightAnalyzerActivity
 
     /** Threshold value to determine if phone is currently indoor or outdoor based on
      * light intensity**/
-    private int LIGHT_CUTOFF = 10;
+    private int LIGHT_CUTOFF = 2000;
     /** Start light sensor sampling button. */
     private Button startLightButton;
     /** Stop light sensor sampling button. */
