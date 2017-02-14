@@ -1,0 +1,34 @@
+[
+    {
+        "merged": "C:\\Users\\Josh\\Documents\\GitHub\\reimagined-goggles\\PA2\\ShootingApp\\build\\intermediates\\res\\merged\\debug\\raw\\missile1.wav",
+        "source": "C:\\Users\\Josh\\Documents\\GitHub\\reimagined-goggles\\PA2\\ShootingApp\\src\\main\\res\\raw\\missile1.wav"
+    },
+    {
+        "merged": "C:\\Users\\Josh\\Documents\\GitHub\\reimagined-goggles\\PA2\\ShootingApp\\build\\intermediates\\res\\merged\\debug\\raw\\rifle.mp3",
+        "source": "C:\\Users\\Josh\\Documents\\GitHub\\reimagined-goggles\\PA2\\ShootingApp\\src\\main\\res\\raw\\rifle.mp3"
+    },
+    {
+        "merged": "C:\\Users\\Josh\\Documents\\GitHub\\reimagined-goggles\\PA2\\ShootingApp\\build\\intermediates\\res\\merged\\debug\\raw\\machinegun.mp3",
+        "source": "C:\\Users\\Josh\\Documents\\GitHub\\reimagined-goggles\\PA2\\ShootingApp\\src\\main\\res\\raw\\machinegun.mp3"
+    },
+    {
+        "merged": "C:\\Users\\Josh\\Documents\\GitHub\\reimagined-goggles\\PA2\\ShootingApp\\build\\intermediates\\res\\merged\\debug\\raw\\weirdmachinegun.mp3",
+        "source": "C:\\Users\\Josh\\Documents\\GitHub\\reimagined-goggles\\PA2\\ShootingApp\\src\\main\\res\\raw\\weirdmachinegun.mp3"
+    },
+    {
+        "merged": "C:\\Users\\Josh\\Documents\\GitHub\\reimagined-goggles\\PA2\\ShootingApp\\build\\intermediates\\res\\merged\\debug\\raw\\handgun.mp3",
+        "source": "C:\\Users\\Josh\\Documents\\GitHub\\reimagined-goggles\\PA2\\ShootingApp\\src\\main\\res\\raw\\handgun.mp3"
+    },
+    {
+        "merged": "C:\\Users\\Josh\\Documents\\GitHub\\reimagined-goggles\\PA2\\ShootingApp\\build\\intermediates\\res\\merged\\debug\\raw\\rocket1.wav",
+        "source": "C:\\Users\\Josh\\Documents\\GitHub\\reimagined-goggles\\PA2\\ShootingApp\\src\\main\\res\\raw\\rocket1.wav"
+    },
+    {
+        "merged": "C:\\Users\\Josh\\Documents\\GitHub\\reimagined-goggles\\PA2\\ShootingApp\\build\\intermediates\\res\\merged\\debug\\raw\\torpedo.wav",
+        "source": "C:\\Users\\Josh\\Documents\\GitHub\\reimagined-goggles\\PA2\\ShootingApp\\src\\main\\res\\raw\\torpedo.wav"
+    },
+    {
+        "merged": "C:\\Users\\Josh\\Documents\\GitHub\\reimagined-goggles\\PA2\\ShootingApp\\build\\intermediates\\res\\merged\\debug\\raw\\rifle2.mp3",
+        "source": "C:\\Users\\Josh\\Documents\\GitHub\\reimagined-goggles\\PA2\\ShootingApp\\src\\main\\res\\raw\\rifle2.mp3"
+    }
+]

@@ -3,13 +3,12 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath 'com.android.tools.build:gradle:2.2.3'
     }
 }
 apply plugin: 'android'
-
 android {
-    compileSdkVersion 'Google Inc.:Google APIs:23'
+    compileSdkVersion 22
     buildToolsVersion '25.0.2'
 
     buildTypes {
@@ -18,4 +17,7 @@ android {
             proguardFile getDefaultProguardFile('proguard-android.txt')
         }
     }
+}
+
+dependencies {
 }
