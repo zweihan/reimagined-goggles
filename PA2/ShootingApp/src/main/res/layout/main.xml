@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+  <LinearLayout 
+      android:orientation="vertical"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent">
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Shooting app\n(Adjust music volume for gunshot sound effects)"
+        />
+
+    <!-- Linear accelerometer processing -->
+    <TextView  
+        android:id="@+id/TextView_Accl"
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content" 
+        android:text="\nLinear accl sensor" 
+        />
+
+    <!-- Gravity sensor processing -->
+    <TextView  
+        android:id="@+id/TextView_Gravity"
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content" 
+        android:text="\nGravity sensor" 
+        />
+
+    <!-- Phone gesture -->
+    <TextView  
+        android:id="@+id/TextView_PhoneGesture"
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content" 
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="\nNumber of gestures:" 
+        />
+
+    <!-- Phone face up or not -->
+    <TextView  
+        android:id="@+id/TextView_PhoneFaceUp"
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content" 
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="\nIs phone face up?:" 
+        />
+
+    <!-- Shooting region -->
+    <TextView  
+        android:id="@+id/TextView_PhoneShootingRegion"
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge" 
+        android:text="\nShooting region:" 
+        />
+
+  </LinearLayout>
+
+</ScrollView>
