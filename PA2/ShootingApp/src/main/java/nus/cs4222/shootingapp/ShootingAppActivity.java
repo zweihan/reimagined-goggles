@@ -143,6 +143,10 @@ public class ShootingAppActivity
         // Get references to the linear accl and gravity sensors
         acclSensor = sensorManager.getDefaultSensor( Sensor.TYPE_LINEAR_ACCELERATION );
         gravitySensor = sensorManager.getDefaultSensor( Sensor.TYPE_GRAVITY );
+        // The regular acceleration sensor and magnetic sensor can be used to determine orientation
+        accelerometerSensor = sensorManager.getDefaultSensor( Sensor.TYPE_ACCELEROMETER );
+        magneticSensor = sensorManager.getDefaultSensor( Sensor.TYPE_MAGNETIC_FIELD );
+
         if( acclSensor == null ) {
             throw new Exception( "Oops, there is no linear accelerometer sensor on this device :(" );
         }
@@ -163,10 +167,16 @@ public class ShootingAppActivity
 
         // Start sampling the sensors
         sensorManager.registerListener( this ,                              // Listener
-                                        acclSensor ,                        // Sensor to measure 
+                                        acclSensor ,                        // Sensor to measure
                                         SensorManager.SENSOR_DELAY_GAME );  // Measurement interval (microsec)
         sensorManager.registerListener( this ,                              // Listener
-                                        gravitySensor ,                     // Sensor to measure 
+                                        gravitySensor ,                     // Sensor to measure
+                                        SensorManager.SENSOR_DELAY_GAME );  // Measurement interval (microsec)
+        sensorManager.registerListener( this ,                              // Listener
+                                        accelerometerSensor ,               // Sensor to measure
+                                        SensorManager.SENSOR_DELAY_GAME );  // Measurement interval (microsec)
+        sensorManager.registerListener( this ,                              // Listener
+                                        magneticSensor ,                    // Sensor to measure
                                         SensorManager.SENSOR_DELAY_GAME );  // Measurement interval (microsec)
     }
 
@@ -193,21 +203,24 @@ public class ShootingAppActivity
         else if( event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION ) {
             processAcclValues( event );
         }
+        else if( event.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
+            System.arraycopy(event.values, 0, accelerometerReading, 0, accelerometerReading.length);
+        }
+        else if( event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD ) {
+            System.arraycopy(event.values, 0, magnometerReading, 0, magnometerReading.length);
+        }
 
-        // PA3: Detect the shooting direction and region.
-        //  Think about what sensor or sensors on the phone can 
-        //  help you do this.
         detectShootingDirectionAndRegion( event );
     }
 
     /** Process the gravity sensor. */
     private void processGravityValues( SensorEvent event ) {
 
-        // Use the gravity sensor to detect whether the phone is 
+        // Use the gravity sensor to detect whether the phone is
         //  face up and nearly parallel to the ground.
         // When the phone is in this position, the gravity should be
         //  (0 , 0 , g). Otherwise, it is at an angle to the ground,
-        //  which can be calculated as the angle between the sampled 
+        //  which can be calculated as the angle between the sampled
         //  gravity vector and the (0 , 0 , 1) phone's z-axis.
 
         // Store the gravity readings
@@ -217,19 +230,19 @@ public class ShootingAppActivity
         float[] zaxis = new float[] { 0.0F , 0.0F , 1.0F };
 
         // Calculate the angle between z-axis and gravity sensor vector.
-        // NOTE: This calculation can be easily optimized since there 
+        // NOTE: This calculation can be easily optimized since there
         //       are 0s and 1s, but is shown here in full for clarity.
         // Use Dot product formula to find angle between two vectors.
         float[] v1 = zaxis , v2 = gravityValues;
-        float dotProduct = 
-            v1[0] * v2[0] + 
-            v1[1] * v2[1] + 
+        float dotProduct =
+            v1[0] * v2[0] +
+            v1[1] * v2[1] +
             v1[2] * v2[2];
-        float mag1 = (float) Math.sqrt( v1[0] * v1[0] + 
-                                        v1[1] * v1[1] + 
+        float mag1 = (float) Math.sqrt( v1[0] * v1[0] +
+                                        v1[1] * v1[1] +
                                         v1[2] * v1[2] );
-        float mag2 = (float) Math.sqrt( v2[0] * v2[0] + 
-                                        v2[1] * v2[1] + 
+        float mag2 = (float) Math.sqrt( v2[0] * v2[0] +
+                                        v2[1] * v2[1] +
                                         v2[2] * v2[2] );
         float cosValue = dotProduct / ( mag1 * mag2 );
         // Clamp the cos value to [-1,1]
@@ -256,11 +269,11 @@ public class ShootingAppActivity
         if( currentTime - lastPhoneAngleTime > MAX_UPDATE_INTERVAL_PHONE_ANGLE ) {
 
             // Update the text view
-            textView_Gravity.setText ( "\nGravity Sensor" + 
-                                       "\nX: " + gravityValues[0] + 
-                                       "\nY: " + gravityValues[1] + 
-                                       "\nZ: " + gravityValues[2] + 
-                                       "\nAngle of phone with horizontal plane: " + angle + " degrees" + 
+            textView_Gravity.setText ( "\nGravity Sensor" +
+                                       "\nX: " + gravityValues[0] +
+                                       "\nY: " + gravityValues[1] +
+                                       "\nZ: " + gravityValues[2] +
+                                       "\nAngle of phone with horizontal plane: " + angle + " degrees" +
                                        "\nIs phone face up?: " + isFaceUp );
             textView_PhoneFaceUp.setText( "\nIs phone face up?: " + isFaceUp );
 
@@ -271,20 +284,28 @@ public class ShootingAppActivity
 
     /** Detect the shooting direction and region. */
     private void detectShootingDirectionAndRegion( SensorEvent event ) {
+        sensorManager.getRotationMatrix(rotationMatrix, null,
+                                        accelerometerReading, magnometerReading);
+        sensorManager.getOrientation(rotationMatrix, orientationAngles);
 
-        // PA3: Detect the shooting direction and region.
-        //  Think about what sensor or sensors on the phone can 
-        //  help you do this.
+        // Convert the direction the user is facing to degrees away from North
+        float shootingDirection = (float)Math.toDegrees(orientationAngles[0]);
+        // Add 360 degrees to negative numbers so we get a range from 0-360
+        if (shootingDirection < 0) {
+            shootingDirection += 360;
+        }
+
+        shootingRegion = (int)Math.floor(shootingDirection/45) + 1;
 
         // PA3: After you have detected the shooting region, assign the
-        //  region number (in the range 1 to 8) to the member variable 
+        //  region number (in the range 1 to 8) to the member variable
         //  'shootingRegion', and the shooting direction (in the range
-        //  0 to 360 deg) to the member variable 'shootingDirection', 
+        //  0 to 360 deg) to the member variable 'shootingDirection',
         //  both variables are defined at the end of the Java code.
-        // The processAcclValues() method produces the gunshot sound 
+        // The processAcclValues() method produces the gunshot sound
         //  based on the value of 'shootingRegion' (which is set to 1
         //  by default).
-        // Also, display the shooting direction and the shooting region 
+        // Also, display the shooting direction and the shooting region
         //  in the text view below.
 
         // Update the GUI (at a slower rate easy for the user to see on screen)
@@ -292,8 +313,10 @@ public class ShootingAppActivity
         if( currentTime - lastPhoneDirectionTime > MAX_UPDATE_INTERVAL_PHONE_DIRECTION ) {
 
             // Update the text view
-            textView_PhoneShootingRegion.setText( "\nShooting direction: " + shootingDirection + " degrees" + 
-                                                  "\nShooting region: " + shootingRegion );
+            textView_PhoneShootingRegion.setText( "\nShooting direction: " +
+                                                    String.format("%.1f", shootingDirection) +
+                                                    " degrees" +
+                                                    "\nShooting region: " + shootingRegion );
 
             // Set the last GUI update time
             lastPhoneDirectionTime = currentTime;
@@ -313,25 +336,25 @@ public class ShootingAppActivity
         }
 
         // We use only the accl's z-axis (of the phone's co-ordinate system).
-        // You can visualize accl data using the Sensor Kinetics app in 
+        // You can visualize accl data using the Sensor Kinetics app in
         //  the Google play store.
         float zAccl = event.values[2];
 
         // NOTE: Smoothing may not be required for linear accl since it
         //  is typically a processed sensor. If not, then a bit of smoothing
         //  will be required to remove erroneous accl peaks. Note that smoothing
-        //  would increase the latency, so too much smoothing is also not 
+        //  would increase the latency, so too much smoothing is also not
         //  advisable.
 
         // Here we are using a simple ad-hoc technique utilizing two thresholds
         //  for gesture detection.
-        //  More advanced approaches include machine learning and dynamic time 
+        //  More advanced approaches include machine learning and dynamic time
         //  warping for gesture recognition.
 
         // Check if the force exerted by the accl is large enough.
-        // The thresholds used below should normally be based on data collected 
-        //  from different users performing the gesture, but for this assignment, 
-        //  you can manually set thresholds that work reasonably ok for your 
+        // The thresholds used below should normally be based on data collected
+        //  from different users performing the gesture, but for this assignment,
+        //  you can manually set thresholds that work reasonably ok for your
         //  phone.
         if( zAccl >= MIN_ACCL_FORCE ) {
 
@@ -342,7 +365,7 @@ public class ShootingAppActivity
                 ++numGestures;
                 isAcclInPeakZone = true;
 
-                // Play gunshot sound according to 
+                // Play gunshot sound according to
                 //  the user's shooting direction (region).
                 // If there are more shooting regions than gun types, then
                 //  repeat gun types in more than one shooting region. Note
@@ -369,10 +392,10 @@ public class ShootingAppActivity
         if( currentTime - lastPhoneGestureTime > MAX_UPDATE_INTERVAL_PHONE_GESTURE ) {
 
             // Update the text view
-            textView_Accl.setText ( "\nLinear Accelerometer Sensor" + 
-                                    "\nX: " + acclValues[0] + 
-                                    "\nY: " + acclValues[1] + 
-                                    "\nZ: " + acclValues[2] + 
+            textView_Accl.setText ( "\nLinear Accelerometer Sensor" +
+                                    "\nX: " + acclValues[0] +
+                                    "\nY: " + acclValues[1] +
+                                    "\nZ: " + acclValues[2] +
                                     "\nNumber of gestures: " + numGestures );
             textView_PhoneGesture.setText( "\nNumber of gestures: " + numGestures );
 
@@ -382,6 +405,7 @@ public class ShootingAppActivity
 
     }
 
+    /** TODO */
     /** Called when the accuracy changes. */
     public void onAccuracyChanged ( Sensor sensor , int accuracy ) {
         // Ignore (except for magnetic sensor for figure 8 calibration)
@@ -430,8 +454,8 @@ public class ShootingAppActivity
 
     /** Called when a sound file has been loaded. */
     @Override
-    public void onLoadComplete( SoundPool pool , 
-                                int sampleID , 
+    public void onLoadComplete( SoundPool pool ,
+                                int sampleID ,
                                 int status ) {
 
         // Check if the load was OK
@@ -471,11 +495,11 @@ public class ShootingAppActivity
         int priority = 1;
         int noLoop = 0;
         float normalPlaybackRate = 1.0F;
-        soundPool.play( streamID , 
-                        leftVolume , 
-                        rightVolume , 
-                        priority , 
-                        noLoop , 
+        soundPool.play( streamID ,
+                        leftVolume ,
+                        rightVolume ,
+                        priority ,
+                        noLoop ,
                         normalPlaybackRate );
     }
 
@@ -486,8 +510,8 @@ public class ShootingAppActivity
         handler.post( new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText ( getApplicationContext() , 
-                                     toastMessage , 
+                    Toast.makeText ( getApplicationContext() ,
+                                     toastMessage ,
                                      Toast.LENGTH_SHORT ).show();
                 }
             } );
@@ -500,6 +524,10 @@ public class ShootingAppActivity
     private Sensor acclSensor;
     /** Gravity sensor. */
     private Sensor gravitySensor;
+    /** (Regular) Accl sensor. */
+    private Sensor accelerometerSensor;
+    /** Magnetometer Sensor */
+    private Sensor magneticSensor;
 
     // Gravity sensor
     /** Last time the GUI was updated about phone angle (UNIX millisec). */
@@ -536,6 +564,14 @@ public class ShootingAppActivity
     private float shootingDirection;
     /** Shooting region the user is pointing at (numbered from 1 .. NUM_SHOOTING_REGIONS). */
     private int shootingRegion;
+    /** Stores the readings from the accelerometer */
+    private final float[] accelerometerReading = new float[3];
+    /** Stores the readings from the magnometer */
+    private final float[] magnometerReading = new float[3];
+    /** The rotation matrix for computing orientation */
+    private final float[] rotationMatrix = new float[9];
+    /** The angles of orientation */
+    private final float[] orientationAngles = new float[3];
 
     // GUI widgets
     /** Text view displaying the linear accl processing. */
