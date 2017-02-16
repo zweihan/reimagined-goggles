@@ -209,13 +209,14 @@ public class ShootingAppActivity
         else if( event.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
 //            System.arraycopy(event.values, 0, accelerometerReading, 0, accelerometerReading.length);
             accelerometerReading = event.values.clone();
+            detectShootingDirectionAndRegion();
         }
         else if( event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD ) {
 //            System.arraycopy(event.values, 0, magnometerReading, 0, magnometerReading.length);
             magnometerReading = event.values.clone();
+            detectShootingDirectionAndRegion();
         }
 
-        detectShootingDirectionAndRegion();
     }
 
     /** Process the gravity sensor. */
