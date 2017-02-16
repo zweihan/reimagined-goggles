@@ -153,6 +153,8 @@ public class ShootingAppActivity
         else if( gravitySensor == null ) {
             throw new Exception( "Oops, there is no gravity sensor on this device :(" );
         }
+
+        directionCalculation = new DirectionCalculation();
     }
 
     /** Starts sampling the sensors. */
@@ -178,6 +180,7 @@ public class ShootingAppActivity
         sensorManager.registerListener( this ,                              // Listener
                                         magneticSensor ,                    // Sensor to measure
                                         SensorManager.SENSOR_DELAY_GAME );  // Measurement interval (microsec)
+        handler.postDelayed(directionCalculation, 500);
     }
 
     /** Stops all sensing. */
@@ -204,13 +207,15 @@ public class ShootingAppActivity
             processAcclValues( event );
         }
         else if( event.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
-            System.arraycopy(event.values, 0, accelerometerReading, 0, accelerometerReading.length);
+//            System.arraycopy(event.values, 0, accelerometerReading, 0, accelerometerReading.length);
+            accelerometerReading = event.values.clone();
         }
         else if( event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD ) {
-            System.arraycopy(event.values, 0, magnometerReading, 0, magnometerReading.length);
+//            System.arraycopy(event.values, 0, magnometerReading, 0, magnometerReading.length);
+            magnometerReading = event.values.clone();
         }
 
-        detectShootingDirectionAndRegion( event );
+        detectShootingDirectionAndRegion();
     }
 
     /** Process the gravity sensor. */
@@ -283,19 +288,7 @@ public class ShootingAppActivity
     }
 
     /** Detect the shooting direction and region. */
-    private void detectShootingDirectionAndRegion( SensorEvent event ) {
-        sensorManager.getRotationMatrix(rotationMatrix, null,
-                                        accelerometerReading, magnometerReading);
-        sensorManager.getOrientation(rotationMatrix, orientationAngles);
-
-        // Convert the direction the user is facing to degrees away from North
-        float shootingDirection = (float)Math.toDegrees(orientationAngles[0]);
-        // Add 360 degrees to negative numbers so we get a range from 0-360
-        if (shootingDirection < 0) {
-            shootingDirection += 360;
-        }
-
-        shootingRegion = (int)Math.floor(shootingDirection/45) + 1;
+    private void detectShootingDirectionAndRegion() {
 
         // PA3: After you have detected the shooting region, assign the
         //  region number (in the range 1 to 8) to the member variable
@@ -565,13 +558,15 @@ public class ShootingAppActivity
     /** Shooting region the user is pointing at (numbered from 1 .. NUM_SHOOTING_REGIONS). */
     private int shootingRegion;
     /** Stores the readings from the accelerometer */
-    private final float[] accelerometerReading = new float[3];
+    private float[] accelerometerReading;
     /** Stores the readings from the magnometer */
-    private final float[] magnometerReading = new float[3];
+    private float[] magnometerReading;
     /** The rotation matrix for computing orientation */
-    private final float[] rotationMatrix = new float[9];
+    private float[] rotationMatrix = new float[9];
     /** The angles of orientation */
-    private final float[] orientationAngles = new float[3];
+    private float[] orientationAngles = new float[3];
+
+    private DirectionCalculation directionCalculation;
 
     // GUI widgets
     /** Text view displaying the linear accl processing. */
@@ -612,4 +607,30 @@ public class ShootingAppActivity
     private Handler handler;
     /** TAG used for ddms logging. */
     private static final String TAG = "ShootingApp";
+
+    private class DirectionCalculation implements Runnable {
+
+
+        public void run(){
+            runCalc();
+        }
+
+        public void runCalc() {
+            if(accelerometerReading != null && magnometerReading != null) {
+                sensorManager.getRotationMatrix(rotationMatrix, null,
+                        accelerometerReading, magnometerReading);
+                sensorManager.getOrientation(rotationMatrix, orientationAngles);
+
+                    // Convert the direction the user is facing to degrees away from North
+                shootingDirection = (float)Math.toDegrees(orientationAngles[0]);
+                // Add 360 degrees to negative numbers so we get a range from 0-360
+                if (shootingDirection < 0) {
+                    shootingDirection += 360;
+                }
+
+                shootingRegion = (int)Math.floor(shootingDirection/45) + 1;
+                handler.postDelayed(this, 250);
+            }
+        }
+    }
 }
