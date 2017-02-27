@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">CS4222PiLoc</string>
+    <string name="title_activity_maps">CS4222PiLoc</string>
+    <string name="play_services_not_installed">Google Play services is not installed on this device.</string>
+    <string name="map_not_ready">Map is not ready yet</string>
+
+
+    <!--     Indoor    -->
+    <string name="activate_higher_level">Activate Higher Level</string>
+    <string name="focused_building_info">Focused Building</string>
+    <string name="focused_level_info">Focused Level</string>
+    <string name="indoor_demo_description">Demonstrates how to use the Indoor API.</string>
+    <string name="indoor_demo_label">Indoor</string>
+    <string name="toggle_level_picker">Toggle Level Picker</string>
+
+
+    "",
+    "",
+    ""
+    <string name="operation_label_config">Upload Config Data</string>
+    <string name="operation_label_cancel">Cancel Mapping</string>
+    <string name="operation_label_save">Save WiFi Data</string>
+    <string name="operation_label_upload">Upload WiFi Data</string>
+    <string name="operation_label_upload_local_file">Upload Local Trace</string>
+    v<string name="operation_label_load_local_file">Load Local Trace</string>
+    <string name="operation_label_show">Download Radio Map</string>
+    <string name="operation_label_localization">Start Localization</string>
+    <string name="operation_label_default">Exit</string>
+    <string name="operation_choose">Choose Operation</string>
+    <string name="location_choose">Choose Location</string>
+    <string name="location_pick">Pick the location from map</string>
+    <string name="operation_set_to">operation set to: %1$s</string>
+    <string name="wifi_buttons">Scan WiFi Beacon</string>
+
+    <!--    Permissions    -->
+    <string name="permission_rationale_location">Access to the location service is required to demonstrate the \'my location\' feature, which shows your current location on the map.</string>
+    <string name="location_permission_denied">This sample requires location permission to enable the \'my location\' layer. Please try again and grant access to use the location.\nIf the permission has been permanently denied, it can be enabled from the System Settings &gt; Apps &gt; \'Google Maps API Demos\'.</string>
+    <string name="permission_required_toast">Location permission is required for this demo.</string>
+
+
+</resources>
