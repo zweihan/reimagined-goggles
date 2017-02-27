@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.app.Activity;
 import android.content.Context;
+import android.os.HandlerThread;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.hardware.Sensor;
@@ -59,6 +60,11 @@ public class ShootingAppActivity
             // Tell the user
             createToast( "Unable to start activity, check error log" );
         }
+
+        //start new thread and handler for calculation of direction
+        HandlerThread ht = new HandlerThread("CalculationHandlerThread");
+        ht.start();
+        calculationHandler = new Handler(ht.getLooper());
     }
 
     /** Called when the activity is destroyed. */
@@ -143,6 +149,7 @@ public class ShootingAppActivity
         // Get references to the linear accl and gravity sensors
         acclSensor = sensorManager.getDefaultSensor( Sensor.TYPE_LINEAR_ACCELERATION );
         gravitySensor = sensorManager.getDefaultSensor( Sensor.TYPE_GRAVITY );
+
         // The regular acceleration sensor and magnetic sensor can be used to determine orientation
         accelerometerSensor = sensorManager.getDefaultSensor( Sensor.TYPE_ACCELEROMETER );
         magneticSensor = sensorManager.getDefaultSensor( Sensor.TYPE_MAGNETIC_FIELD );
@@ -180,7 +187,7 @@ public class ShootingAppActivity
         sensorManager.registerListener( this ,                              // Listener
                                         magneticSensor ,                    // Sensor to measure
                                         SensorManager.SENSOR_DELAY_GAME );  // Measurement interval (microsec)
-        handler.postDelayed(directionCalculation, 500);
+        calculationHandler.postDelayed(directionCalculation, 500);
     }
 
     /** Stops all sensing. */
@@ -606,6 +613,7 @@ public class ShootingAppActivity
     // For DDMS Logging and Toasts
     /** Handler to the main thread. */
     private Handler handler;
+    private Handler calculationHandler;
     /** TAG used for ddms logging. */
     private static final String TAG = "ShootingApp";
 
@@ -630,7 +638,7 @@ public class ShootingAppActivity
                 }
 
                 shootingRegion = (int)Math.floor(shootingDirection/45) + 1;
-                handler.postDelayed(this, 250);
+                calculationHandler.postDelayed(this, 250);
             }
         }
     }
