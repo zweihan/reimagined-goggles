@@ -3,7 +3,7 @@
 */.idea/
 *.jar
 
-*build/*
+*/build/*
 
 PA1/.gradle/*
 PA1/.idea/*
