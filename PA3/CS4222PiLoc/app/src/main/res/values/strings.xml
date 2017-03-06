@@ -25,6 +25,7 @@
     v<string name="operation_label_load_local_file">Load Local Trace</string>
     <string name="operation_label_show">Download Radio Map</string>
     <string name="operation_label_localization">Start Localization</string>
+    <string name="operation_get_fingerprints">Get Fingerprints</string>
     <string name="operation_label_default">Exit</string>
     <string name="operation_choose">Choose Operation</string>
     <string name="location_choose">Choose Location</string>

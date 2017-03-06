@@ -54,6 +54,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
+import java.io.FileOutputStream;
 
 import static org.nus.cirlab.mapactivity.R.id.map;
 
@@ -79,6 +80,32 @@ public class MapsActivity extends AppCompatActivity implements OnMarkerDragListe
     private RadioMapCollectionService mPilocService = null;
     private TextView mAccuracyText ;
 
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
+    /**
+     * Checks if the app has permission to write to device storage
+     *
+     * If the app does not has permission then the user will be prompted to grant permissions
+     *
+     * @param activity
+     */
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+    }
 
     private int mOperationIds[] = {
             R.string.operation_label_config,
@@ -89,6 +116,7 @@ public class MapsActivity extends AppCompatActivity implements OnMarkerDragListe
             R.string.operation_label_load_local_file,
             R.string.operation_label_show,
             R.string.operation_label_localization,
+            R.string.operation_get_fingerprints,
             R.string.operation_label_default
     };
     int pointSize = 1;
@@ -273,11 +301,47 @@ public class MapsActivity extends AppCompatActivity implements OnMarkerDragListe
 
                 }
                 break;
+            case R.string.operation_get_fingerprints:
+                getFingerprints();
+                break;
             case R.string.operation_label_default:
                 this.finish();
                 break;
             default:
                 return;
+        }
+    }
+
+    public void getFingerprints() {
+        try {
+            Vector<Fingerprint> fp = mPilocService.getFingerprint();
+            String data = "";
+            for (Fingerprint fingerprint : fp) {
+                data = data + fingerprint.mMac.toString() + " " + fingerprint.mRSSI.toString() + "\n";
+            }
+            data = data + "-----------------------------------\n";
+
+            String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString() + "/";
+            verifyStoragePermissions(this);
+            // Create the parent path
+            File dir = new File(path);
+            if (!dir.exists()) {
+                Boolean val = dir.mkdirs();
+            }
+            File f = new File(path + "fingerprint.txt");
+            if (!f.exists()) {
+                Boolean val = f.createNewFile();
+            }
+
+            FileOutputStream stream = new FileOutputStream(f, true);
+            try {
+                stream.write(data.getBytes());
+            } finally {
+                stream.close();
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -940,6 +1004,7 @@ public class MapsActivity extends AppCompatActivity implements OnMarkerDragListe
                     while (mIsLocating) {
                         // Get current fingerprints
                         Vector<Fingerprint> fp = mPilocService.getFingerprint();
+
                         if(fp!=null && fp.size()>0){
                             Log.d(TAG, "finger print size: "+fp.size());
                             mCurrentLocation = getLocation(mRadioMap, fp);
