@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -52,9 +53,13 @@ import org.nus.cirlab.mapactivity.DataStructure.StepInfo;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.Vector;
 import java.io.FileOutputStream;
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
 
 import static org.nus.cirlab.mapactivity.R.id.map;
 
@@ -316,6 +321,10 @@ public class MapsActivity extends AppCompatActivity implements OnMarkerDragListe
         try {
             Vector<Fingerprint> fp = mPilocService.getFingerprint();
             String data = "";
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+8"));
+            SimpleDateFormat mdformat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            String strDate = mdformat.format(calendar.getTime());
+            data = data + strDate + "\n\n";
             for (Fingerprint fingerprint : fp) {
                 data = data + fingerprint.mMac.toString() + " " + fingerprint.mRSSI.toString() + "\n";
             }
