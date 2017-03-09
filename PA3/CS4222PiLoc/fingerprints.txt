@@ -1,0 +1,45 @@
+private Vector<Fingerprint> getFingerprint() {
+
+        Vector<Fingerprint> fingerprints = new Vector<Fingerprint>(13);
+
+        Fingerprint f = new Fingerprint("84:b8:02:00:3b:bb", 83, 5);
+        fingerprints.add(f);
+
+        f = new Fingerprint("88:f0:31:8d:21:cf", 82, 5);
+        fingerprints.add(f);
+
+        f = new Fingerprint("84:b8:02:00:3b:bf", 80, 5);
+        fingerprints.add(f);
+
+        f = new Fingerprint("88:f0:31:8d:21:cb", 85, 5);
+        fingerprints.add(f);
+
+        f = new Fingerprint("a8:9d:21:74:0c:09", 75, 5);
+        fingerprints.add(f);
+
+        f = new Fingerprint("74:a2:e6:ec:55:c5", 71, 5);
+        fingerprints.add(f);
+
+        f = new Fingerprint("74:a2:e6:ec:55:c9", 64, 5);
+        fingerprints.add(f);
+
+        f = new Fingerprint("a8:9d:21:74:0d:9f", 69, 5);
+        fingerprints.add(f);
+
+        f = new Fingerprint("a8:9d:21:44:05:aa", 85, 5);
+        fingerprints.add(f);
+
+        f = new Fingerprint("a8:9d:21:0f:7e:89", 58, 5);
+        fingerprints.add(f);
+
+        f = new Fingerprint("a8:9d:21:0f:7e:87", 51, 5);
+        fingerprints.add(f);
+
+        f = new Fingerprint("a8:9d:21:74:0d:99", 66, 5);
+        fingerprints.add(f);
+
+        f = new Fingerprint("a8:9d:21:0f:7e:8f", 45, 5);
+        fingerprints.add(f);
+
+        return fingerprints;
+    }
