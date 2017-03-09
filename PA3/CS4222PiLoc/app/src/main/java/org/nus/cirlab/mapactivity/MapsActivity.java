@@ -63,6 +63,7 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Map;
 
 import static org.nus.cirlab.mapactivity.R.id.map;
 
