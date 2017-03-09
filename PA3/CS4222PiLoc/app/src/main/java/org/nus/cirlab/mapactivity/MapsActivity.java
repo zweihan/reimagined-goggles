@@ -1047,32 +1047,81 @@ public class MapsActivity extends AppCompatActivity implements OnMarkerDragListe
         }).start();
     }
 
-    //You need to improve this algorithm
     public LatLng getLocation(RadioMap mRadioMap, Vector<Fingerprint> fp) {
-        // try your own localization algorithm here
-        LatLng Key = null;
-        double sum;
-        double minScore = Double.MAX_VALUE;
 
-        for (LatLng k : mRadioMap.mLocFingerPrints.keySet()) {
-            int number = 0;
-            sum = 0;
-            for (Fingerprint f1 : fp) {
-                for(Fingerprint f2 :mRadioMap.mLocFingerPrints.get(k)){
-                    if(f1.mMac.equalsIgnoreCase(f2.mMac)){
-                        number++;
-                        sum += f1.mRSSI-f2.mRSSI;
-                        break;
-                    }
+        if(mRadioMap == null || fp == null){
+            return null;
+        }
+
+        HashMap<String, Double> map = getFingerprintMap(fp);
+        LatLng geo = null;
+        double minError = Double.MAX_VALUE;
+        int minErrorNumAP = 0;
+
+        for (Map.Entry<LatLng, Vector<Fingerprint>> entry
+                : mRadioMap.mLocFingerPrints.entrySet()) {
+
+            Vector<Fingerprint> fingerprints = entry.getValue();
+            HashSet<String> uniqueFingerprints = new HashSet<String>(map.size()*2);
+            double totalError = 0;
+
+            for( Fingerprint f : fingerprints ){
+                String mac = f.mMac.toLowerCase();
+                if( map.containsKey(mac) ){
+                    double mRSSI = map.get(mac);
+                    totalError += ((f.mRSSI-mRSSI)*(f.mRSSI-mRSSI));
+                    uniqueFingerprints.add(mac);
                 }
             }
 
-            if ( number > fp.size() / 3 && sum < minScore) {
-                minScore = sum;
-                Key = new LatLng(k.latitude, k.longitude);
+            if( uniqueFingerprints.size() > (map.size() / 2.0) ){
+
+                totalError = Math.sqrt(totalError);
+                if( uniqueFingerprints.size() > minErrorNumAP
+                        || (uniqueFingerprints.size() == minErrorNumAP && totalError < minError) ){
+                    geo = entry.getKey();
+                    minError = totalError;
+                    minErrorNumAP = uniqueFingerprints.size();
+                }
             }
         }
-        return Key;
+        return geo;
+    }
+
+    private HashMap<String, Double> getFingerprintMap(Vector<Fingerprint> fp) {
+
+        HashMap<String, Double> fingerprints
+                = new HashMap<String, Double>(fp.size()*2);
+
+        HashMap<String, Integer> counts
+                = new HashMap<String, Integer>(fp.size()*2);
+
+        for( Fingerprint fingerprint : fp ){
+            if(fingerprint != null){
+                String mac = fingerprint.mMac;
+                if(mac != null){
+                    mac = mac.toLowerCase();
+                    if(!fingerprints.containsKey(mac)){
+                        fingerprints.put(mac, (double)fingerprint.mRSSI);
+                        counts.put( mac, 1 );
+                    } else {
+                        double sum = fingerprints.get(mac) + fingerprint.mRSSI;
+                        fingerprints.put(mac, sum);
+                        counts.put(mac, counts.get(mac)+1);
+                    }
+                }
+            }
+        }
+
+        Set<Map.Entry<String, Double>> tempSet = fingerprints.entrySet();
+        for(Map.Entry<String, Double> entry : tempSet){
+            String mac = entry.getKey();
+            int count = counts.get(mac);
+            double mRSSI = entry.getValue();
+            entry.setValue(mRSSI/count);
+        }
+
+        return fingerprints;
     }
 
     public void ShowRadioMap() {
