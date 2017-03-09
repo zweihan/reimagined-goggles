@@ -60,6 +60,9 @@ import java.util.Vector;
 import java.io.FileOutputStream;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.nus.cirlab.mapactivity.R.id.map;
 
