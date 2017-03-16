@@ -1,0 +1,31 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.2.0'
+    }
+}
+apply plugin: 'android'
+
+dependencies {
+    compile fileTree(dir: 'libs', include: '*.jar')
+    compile "com.android.support:support-v4:20.0.+"
+    compile "com.google.android.gms:play-services:8.1.0"
+}
+
+android {
+    compileSdkVersion 'android-23'
+    buildToolsVersion '25.0.2'
+
+    defaultConfig {
+        applicationId "nus.cs4222.sensorlogapp"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFile getDefaultProguardFile('proguard-android.txt')
+        }
+    }
+}

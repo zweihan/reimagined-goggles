@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <LinearLayout 
+        android:id="@+id/main_layout"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <!-- Title -->
+        <TextView  
+            android:layout_width="fill_parent" 
+            android:layout_height="wrap_content"
+            android:gravity="center" 
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Sensor Data Collection" />
+        <View 
+            android:background="#FFFFFF" 
+            android:layout_width="fill_parent"
+            android:layout_height="2dip"
+            android:layout_margin="5dp" />
+
+        <!-- Start Button -->
+        <Button
+            android:id="@+id/start_button"
+            android:layout_width="fill_parent" 
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Start logging" />
+        <!-- Stop Button -->
+        <Button
+            android:id="@+id/stop_button"
+            android:layout_width="fill_parent" 
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Stop logging" />
+        <View 
+            android:background="#FFFFFF" 
+            android:layout_width="fill_parent"
+            android:layout_height="2dip"
+            android:layout_margin="5dp" />
+
+    </LinearLayout>
+
+</ScrollView>
