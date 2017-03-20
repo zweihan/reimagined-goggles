@@ -12,3 +12,7 @@ PA1/build/*
 PA2/ShootingApp/.gradle/*
 PA2/ShootingApp/.idea/*
 PA2/ShootingApp/build/*
+
+project/SensorLogAppWithPiloc/.gradle/*
+project/SensorLogAppWithPiloc/.idea/*
+project/SensorLogAppWithPiloc/build/*
