@@ -1,0 +1,75 @@
+<!-- Build xml file to build a source code tree -->
+<project>
+
+  <!-- Fully qualified name of the 'main' class -->
+  <property name="main_class" value="nus.cs4222.activityeval.ActivityEvaluator" />
+  <!-- Name of resultant jar file without extension -->
+  <property name="jar.name" value="ActivityEval" />
+
+  <!-- Path of the source java code -->
+  <property name="src" value="src" />
+  <!-- Path of the library folder -->
+  <property name="libs" value="libs" />
+  <!-- Path of the compiled class code -->
+  <property name="build" value="build" />
+
+  <!-- Set of all jar files in the libs folder -->
+  <path id="libs.path">
+    <fileset dir="${libs}" includes="**/*.jar"/>
+  </path>
+
+  <!-- Clean everything -->
+  <target name="clean">
+    <delete dir="${build}"/>
+  </target>
+
+  <!-- Compile all Java code in source folder-->
+  <target name="compile">
+    <mkdir dir="${build}/classes"/>
+    <javac srcdir="${src}" 
+           destdir="${build}/classes"
+           classpathref="libs.path"
+           includeantruntime="false"
+           debug="true" 
+           debuglevel="lines,vars,source"/>
+  </target>
+
+  <!-- Create a jar file of the compiled code -->
+  <target name="jarify" 
+          depends="compile">
+    <!--
+       For security reasons, '$ java -jar' IGNORES any classpath specified as
+       argument. So, to execute a jar file which needs other third party jars,
+       we need to specify the CLASSPATH explicitly in its MANIFEST file.
+       This classpath in the manifest MUST contain ONLY relative paths from
+       the jar file to be executed.
+       The 'manifestclasspath' tag is used to CONVERT a path into a property 
+       STRING, containing relative paths as required. The name of the property
+       in this case is 'manifest.classpath'. It is a property string used to
+       set the CLASSPATH in the manifest file below.
+     -->
+    <manifestclasspath property="manifest.classpath" jarfile="${jar.name}.jar">
+      <classpath refid="libs.path" />
+    </manifestclasspath>
+
+    <!-- Jarify the class files, and set the classpath as required -->
+    <jar destfile="${jar.name}.jar" 
+         basedir="${build}/classes"
+         whenmanifestonly="fail"
+         duplicate="fail">
+      <manifest>
+        <attribute name="Main-Class" value="${main_class}"/>
+        <attribute name="Class-Path" value="${manifest.classpath}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- Run the jar file -->
+  <target name="run" depends="jarify">
+    <!-- The classpath is inside the manifest file itself -->
+    <java jar="${jar.name}.jar" 
+          debug="true"
+          fork="true"/>
+  </target>
+
+</project>
