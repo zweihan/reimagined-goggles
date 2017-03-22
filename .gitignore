@@ -16,3 +16,10 @@ PA2/ShootingApp/build/*
 project/SensorLogAppWithPiloc/.gradle/*
 project/SensorLogAppWithPiloc/.idea/*
 project/SensorLogAppWithPiloc/build/*
+
+project/SensorLogAppWithPiloc/gradle/*
+project/ActivitySimWithPiloc/build/*
+project/ActivitySimWithPiloc/.idea/*
+
+project/ActivityEval/build/*
+project/ActivityEval/.idea/*
