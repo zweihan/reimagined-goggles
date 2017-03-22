@@ -86,6 +86,9 @@ public class ActivityDetection {
             linAccCorr[i] = new Correlation(windowSize); //longer window size
         }
         this.linAccMeanSP = new SignalProcessor(windowSize);
+        this.linAccMeanStdEMA = new ExponentialMovingAverage(0.1);
+        this.avgAbsMeanLinAccEMA = new ExponentialMovingAverage(0.1);
+
         this.lightSP = new SignalProcessor(windowSize);
         this.detectedFPs = new Vector<Fingerprint>();
         File fpListFile = new File("Com1Fingerprints.txt");
@@ -317,11 +320,11 @@ public class ActivityDetection {
             public void run() {
 
                 // Logging to the DDMS (in the simulator, the DDMS log is to the console)
-                System.out.println();
-                Log.i( "ActivitySim" , "Timer " + numberTimers + ": Current simulator time: " +
-                       convertUnixTimeToReadableString( ActivitySimulator.currentTimeMillis() ) );
-                System.out.println( "Timer " + numberTimers + ": Current simulator time: " +
-                                    convertUnixTimeToReadableString( ActivitySimulator.currentTimeMillis() ) );
+//                System.out.println();
+//                Log.i( "ActivitySim" , "Timer " + numberTimers + ": Current simulator time: " +
+//                       convertUnixTimeToReadableString( ActivitySimulator.currentTimeMillis() ) );
+//                System.out.println( "Timer " + numberTimers + ": Current simulator time: " +
+//                                    convertUnixTimeToReadableString( ActivitySimulator.currentTimeMillis() ) );
 
                 // Dummy example of outputting a detected activity
                 //  to the file "DetectedActivities.txt" in the trace folder.
@@ -347,30 +350,33 @@ public class ActivityDetection {
     private void detectActivity(){
         if(linAccCorr[0].processedVal >= windowSize){
 
+//            double avgAbsMeanLinAcc = avgAbsMeanLinAccEMA.average((linAccSP[0].getAbsMean() + linAccSP[1].getAbsMean() + linAccSP[2].getAbsMean()) / 3);
             double avgAbsMeanLinAcc = (linAccSP[0].getAbsMean() + linAccSP[1].getAbsMean() + linAccSP[2].getAbsMean()) / 3;
-
-            if(avgAbsMeanLinAcc >= 0.9){
+            if(avgAbsMeanLinAcc >= 0.85){
                 //is walking
+                System.out.println("WALKING");
                 ActivitySimulator.outputDetectedActivity(UserActivities.WALKING);
             }else{
-                    double meanSP = linAccMeanSP.getAbsStd();
-//                double avgAbsLinAccCorr = (Math.abs(linAccCorr[0].getCorr()) + Math.abs(linAccCorr[1].getCorr()) + Math.abs(linAccCorr[2].getCorr()))/3;
-//                System.out.println("x: " + linAccSP[0].getMean() + ", y: " + linAccSP[1].getMean() + ", z: " + linAccSP[2].getMean());
-//                System.out.println("x: " + linAccCorr[0].getCorr() + ", y: " + linAccCorr[1].getCorr() + ", z: " + linAccCorr[2].getCorr());
-                System.out.println(meanSP);
-                if(meanSP >= 0.035){
+//                    double linAccMeanStd = linAccMeanStdEMA.average(linAccMeanSP.getAbsStd());
+                double linAccMeanStd = linAccMeanSP.getAbsStd();
+//                System.out.println(linAccMeanStd);
+                if(linAccMeanStd >= 0.035){
                     //bus
+                    System.out.println("BUS");
                     ActivitySimulator.outputDetectedActivity(UserActivities.BUS);
                 }else{
                     //idle
                     if(isUserInCom1()){
                         //idle in com1
+                        System.out.println("COM1");
                         ActivitySimulator.outputDetectedActivity(UserActivities.IDLE_COM1);
                     }else{
                         //idle somewhere
                         if(lightSP.getMean() > 2000.0){
+                            System.out.println("OUTDOOR");
                             ActivitySimulator.outputDetectedActivity(UserActivities.IDLE_OUTDOOR);
                         }else{
+                            System.out.println("INDOOR");
                             ActivitySimulator.outputDetectedActivity(UserActivities.IDLE_INDOOR);
                         }
                     }
@@ -398,6 +404,8 @@ public class ActivityDetection {
     private Set<String> com1FPs;
     private SignalProcessor linAccMeanSP;
     private int windowSize;
+    private ExponentialMovingAverage avgAbsMeanLinAccEMA;
+    private ExponentialMovingAverage linAccMeanStdEMA;
 
     //implements online algo to implement sliding window to calculate mean and std dev.
     //This calculates mean and stddev for 1 variable.
@@ -514,6 +522,24 @@ public class ActivityDetection {
 
         public double getAbsCorr(){
             return Math.abs(this.getCorr());
+        }
+    }
+
+    class ExponentialMovingAverage {
+        private double alpha;
+        private Double oldValue;
+        public ExponentialMovingAverage(double alpha) {
+            this.alpha = alpha;
+        }
+
+        public double average(double value) {
+            if (oldValue == null) {
+                oldValue = value;
+                return value;
+            }
+            double newValue = oldValue + alpha * (value - oldValue);
+            oldValue = newValue;
+            return newValue;
         }
     }
 
