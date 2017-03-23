@@ -1023,6 +1023,12 @@ public class MapsActivity extends AppCompatActivity implements OnMarkerDragListe
                             mCurrentLocation = getLocation(mRadioMap, fp);
 
                             if (mCurrentLocation == null) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run(){
+                                        Toast.makeText(getBaseContext(), "Not enough APs to determine location.", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                                 Thread.sleep(500);
                                 continue;
                             } else {
@@ -1052,6 +1058,7 @@ public class MapsActivity extends AppCompatActivity implements OnMarkerDragListe
     }
 
     public LatLng getLocation(RadioMap mRadioMap, Vector<Fingerprint> fp) {
+
 
         if(mRadioMap == null || fp == null){
             return null;
@@ -1089,6 +1096,7 @@ public class MapsActivity extends AppCompatActivity implements OnMarkerDragListe
                 }
             }
         }
+
         return geo;
     }
 
