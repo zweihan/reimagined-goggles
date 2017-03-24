@@ -319,7 +319,7 @@ public class ActivityDetection {
 //              double avgAbsMeanLinAcc = Math.sqrt((linAccSP[0].getSS() + linAccSP[1].getSS() + linAccSP[2].getSS())/3);
             double avgAbsMeanLinAcc = avgAbsMeanLinAccEMA.average((linAccSP[0].getAbsMean() + linAccSP[1].getAbsMean() + linAccSP[2].getAbsMean()) / 3);
 //            double avgAbsMeanLinAcc = (linAccSP[0].getAbsMean() + linAccSP[1].getAbsMean() + linAccSP[2].getAbsMean()) / 3;
-              System.out.println(avgAbsMeanLinAcc);
+//              System.out.println(avgAbsMeanLinAcc);
             if(avgAbsMeanLinAcc >= 0.85){
                 //is walking
 //                System.out.println("WALKING");
@@ -507,25 +507,56 @@ public class ActivityDetection {
     private class ActivityClassifier {
         public UserActivities currentState;
         public int currentStateCount;
+        public UserActivities suggestedNewState; // Suggested because we don't know if we 
+                                                 // should switch for sure
+        public int suggestedNewStateCount;
+        public int tries;
 
         public ActivityClassifier() {
             this.currentState = UserActivities.INCORRECT;
             currentStateCount = 0;
+            suggestedNewStateCount = 0;
+            suggestedNewState = UserActivities.INCORRECT;
+            tries = 0;
         }
 
         public void updateActivity(UserActivities newState){
+            tries++;
             if(currentState == newState){
-                currentStateCount++;
+                currentStateCount++;  
+                return;
+            }   
+            
+            // Change the suggestion if the old one wasn't correct
+            if (newState != suggestedNewState && 
+                    ((float)suggestedNewStateCount/(float)tries) < 0.35) {
+                suggestedNewState = newState;
+                suggestedNewStateCount = 1;
+                tries = 0;
+                return;
+            } else if (newState != suggestedNewState) {
                 return;
             }
+            
+            // We have to be sure this is the new state
+            if (suggestedNewStateCount < 20 || 
+                    (float)suggestedNewStateCount / (float)tries < 0.7) {
+                suggestedNewStateCount++;
+                return;
+            }
+            
             switch(newState){
                 case BUS: ActivitySimulator.outputDetectedActivity(UserActivities.BUS); break;
                 case WALKING: ActivitySimulator.outputDetectedActivity(UserActivities.WALKING); break;
                 case IDLE_INDOOR: ActivitySimulator.outputDetectedActivity(UserActivities.IDLE_INDOOR); break;
                 case IDLE_OUTDOOR: ActivitySimulator.outputDetectedActivity(UserActivities.IDLE_OUTDOOR); break;
                 case IDLE_COM1: ActivitySimulator.outputDetectedActivity(UserActivities.IDLE_COM1); break;
+                default: ActivitySimulator.outputDetectedActivity(UserActivities.INCORRECT); break;
             }
-
+            
+            suggestedNewState = UserActivities.INCORRECT;
+            suggestedNewStateCount = 0;
+            tries = 0;
         }
 
         public void resetStates(){
