@@ -89,7 +89,7 @@ public class ActivityDetection {
         this.linAccMeanStdEMA = new ExponentialMovingAverage(0.1);
         this.avgAbsMeanLinAccEMA = new ExponentialMovingAverage(0.1);
         this.longPeriodSP = new SignalProcessor(900);
-
+        this.longPeriodSPStdSP = new SignalProcessor(1800);
         this.lightSP = new SignalProcessor(windowSize);
         this.detectedFPs = new Vector<Fingerprint>();
         File fpListFile = new File("Com1Fingerprints.txt");
@@ -162,8 +162,13 @@ public class ActivityDetection {
         linAccSP[1].update(y);
         linAccSP[2].update(z);
         longPeriodSP.update(Math.abs(x) + Math.abs(y) + Math.abs(z));
-
         linAccMeanSP.update(linAccSP[0].getMean() + linAccSP[1].getMean() + linAccSP[2].getMean());
+        longPeriodSPStdSP.update(longPeriodSP.getStd());
+        if(linAccSP[0].processedVal % 60 == 0) {
+            System.out.println("ltsp," + timestamp + "," + longPeriodSP.getStd());
+            System.out.println("ltspsp," + timestamp + "," + longPeriodSPStdSP.getStd());
+
+        }
         detectActivity();
     }
 
@@ -352,6 +357,37 @@ public class ActivityDetection {
         }
     }
 
+
+    private void detectActivity2(){
+        if(linAccSP[0].processedVal >= windowSize && linAccSP[0].processedVal % 300 == 0) {
+//            System.out.println(longPeriodSP.findMax());
+//              double avgAbsMeanLinAcc = Math.sqrt((linAccSP[0].getSS() + linAccSP[1].getSS() + linAccSP[2].getSS())/3);
+            double mean = avgAbsMeanLinAccEMA.average((linAccSP[0].getAbsMean() + linAccSP[1].getAbsMean() + linAccSP[2].getAbsMean()) / 3);
+            double abstd = linAccMeanStdEMA.average(linAccMeanSP.getAbsStd());
+//            double mean = (linAccSP[0].getAbsMean() + linAccSP[1].getAbsMean() + linAccSP[2].getAbsMean()) / 3;
+//            double abstd = linAccMeanSP.getAbsStd();
+//            double avgAbsMeanLinAcc = (linAccSP[0].getAbsMean() + linAccSP[1].getAbsMean() + linAccSP[2].getAbsMean()) / 3;
+            if(mean <= 0.8353){
+                if(abstd <= 0.0387){
+                    if(isUserInCom1()){
+                        classifier.updateActivity(UserActivities.IDLE_COM1);
+                    }else if(lightSP.getMean() >= 2000.0){
+                        classifier.updateActivity(UserActivities.IDLE_OUTDOOR);
+                    }else{
+                        classifier.updateActivity(UserActivities.IDLE_INDOOR);
+                    }
+                }else{
+                    classifier.updateActivity(UserActivities.BUS);
+                }
+            }else if(mean <= 0.9916 && abstd > 0.2135){
+                classifier.updateActivity(UserActivities.BUS);
+            }else{
+                classifier.updateActivity(UserActivities.WALKING);
+            }
+        }
+    }
+
+
     private boolean isUserInCom1(){
         for(Fingerprint fp : detectedFPs){
             if(com1FPs.contains(fp.mMac)){
@@ -373,6 +409,7 @@ public class ActivityDetection {
     private ExponentialMovingAverage linAccMeanStdEMA;
     private ActivityClassifier classifier;
     private SignalProcessor longPeriodSP;
+    private SignalProcessor longPeriodSPStdSP;
 
     //implements online algo to implement sliding window to calculate mean and std dev.
     //This calculates mean and stddev for 1 variable.
@@ -446,65 +483,6 @@ public class ActivityDetection {
         }
     }
 
-    private class Correlation {
-        public int windowSize;
-        public double[] xvals;
-        public double[] yvals;
-        public double sumxx;
-        public double sumyy;
-        public double sumxy;
-        public double sumx;
-        public double sumy;
-        public int nextValIndex;
-        public int processedVal;
-
-        public Correlation(int windowSize){
-            this.windowSize = windowSize;
-            this.xvals = new double[windowSize];
-            this.yvals = new double[windowSize];
-            this.sumxx = 0.0;
-            this.sumyy = 0.0;
-            this.sumxy = 0.0;
-            this.sumx = 0.0;
-            this.sumy = 0.0;
-            this.nextValIndex = 0;
-            this.processedVal = 0;
-        }
-        public void printState(){
-            System.out.println("sumxx: " + sumxx + ", sumyy: " +sumyy + ", sumxy: " + sumxy + ", sumx: "+ sumx + ", sumy: "+ sumy);
-        }
-
-        public void update(double newx, double newy){
-            double oldx = xvals[nextValIndex];
-            double oldy = yvals[nextValIndex];
-
-            this.sumxx = this.sumxx + newx*newx - oldx*oldx;
-            this.sumyy = this.sumyy + newy*newy - oldy*oldy;
-            this.sumxy = this.sumxy + newx*newy - oldx*oldy;
-            this.sumx = this.sumx + newx - oldx;
-            this.sumy = this.sumy + newy - oldy;
-
-            this.xvals[nextValIndex] = newx;
-            this.yvals[nextValIndex] = newy;
-
-            nextValIndex = nextValIndex >= windowSize - 1 ? 0 : nextValIndex+1;
-            processedVal++;
-        }
-
-        public double getCorr(){
-            //corr = (E(XY) - E(X)E(Y)) / (STDX * STDY)
-            double stdx = Math.sqrt(this.sumxx / this.windowSize - this.sumx / windowSize * this.sumx / windowSize );
-            double stdy = Math.sqrt(this.sumyy / this.windowSize - this.sumy / windowSize * this.sumy / windowSize );
-            double topline = (this.sumxy / windowSize) - (this.sumx / this.windowSize * this.sumy / this.windowSize);
-//            System.out.println("s: " + varx + ", "+ stdy + ", " + topline);
-
-            return topline / (stdx * stdy);
-        }
-
-        public double getAbsCorr(){
-            return Math.abs(this.getCorr());
-        }
-    }
 
     private class ExponentialMovingAverage {
         private double alpha;
@@ -523,6 +501,7 @@ public class ActivityDetection {
             return newValue;
         }
     }
+
 
 
     private class ActivityClassifier {
