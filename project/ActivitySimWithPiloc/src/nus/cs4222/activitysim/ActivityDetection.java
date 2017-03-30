@@ -164,11 +164,6 @@ public class ActivityDetection {
         longPeriodSP.update(Math.abs(x) + Math.abs(y) + Math.abs(z));
         linAccMeanSP.update(linAccSP[0].getMean() + linAccSP[1].getMean() + linAccSP[2].getMean());
         longPeriodSPStdSP.update(longPeriodSP.getStd());
-        if(linAccSP[0].processedVal % 60 == 0) {
-            System.out.println("ltsp," + timestamp + "," + longPeriodSP.getStd());
-            System.out.println("ltspsp," + timestamp + "," + longPeriodSPStdSP.getStd());
-
-        }
         detectActivity();
     }
 
