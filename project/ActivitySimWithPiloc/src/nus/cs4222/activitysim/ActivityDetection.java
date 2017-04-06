@@ -331,15 +331,15 @@ public class ActivityDetection {
                     classifier.updateActivity(UserActivities.BUS);
                 }else{
                     //idle
-                    if(isUserInCom1()){
-                        //idle in com1
+                    if(lightSP.getMean() > 2000.0){
+                        //idle outdoor somewhere
 //                        System.out.println("COM1");
-                        classifier.updateActivity(UserActivities.IDLE_COM1);
+                        classifier.updateActivity(UserActivities.IDLE_OUTDOOR);
                     }else{
-                        //idle somewhere
-                        if(lightSP.getMean() > 2000.0){
+                        //idle somewhere indoors
+                        if(isUserInCom1()){
 //                            System.out.println("OUTDOOR");
-                            classifier.updateActivity(UserActivities.IDLE_OUTDOOR);
+                            classifier.updateActivity(UserActivities.IDLE_COM1);
                         }else{
 //                            System.out.println("INDOOR");
                             classifier.updateActivity(UserActivities.IDLE_INDOOR);
