@@ -101,7 +101,7 @@ public class ActivityDetection {
         }
         this.classifier = new ActivityClassifier();
         this.baroSP = new SignalProcessor(200);
-
+        this.baroEMA = new ExponentialMovingAverage(0.5);
     }
 
     /** De-initialises the detection algorithm. */
@@ -231,7 +231,7 @@ public class ActivityDetection {
                                           double altitude ,
                                           int accuracy ) {
 
-        baroSP.update(altitude);
+        baroSP.update(baroEMA.average(altitude));
     }
 
     /**
@@ -414,6 +414,7 @@ public class ActivityDetection {
     private SignalProcessor longPeriodSP;
     private SignalProcessor longPeriodSPStdSP;
     private SignalProcessor baroSP;
+    private ExponentialMovingAverage baroEMA;
 
     //implements online algo to implement sliding window to calculate mean and std dev.
     //This calculates mean and stddev for 1 variable.

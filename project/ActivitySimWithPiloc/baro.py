@@ -3,6 +3,7 @@ import numpy
 import matplotlib.pyplot as plt
 from sets import Set
 from dsp import Signalproc
+from ema import ema
 
 
 f = open("7Traces/6/baro.txt", 'r')
