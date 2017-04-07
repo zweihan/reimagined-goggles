@@ -335,11 +335,11 @@ public class ActivityDetection {
                 }else{
                     //idle
                     if(lightSP.getMean() > 2000.0){
-                        //idle in com1
+                        //idle outdoor somewhere
 //                        System.out.println("COM1");
                         classifier.updateActivity(UserActivities.IDLE_OUTDOOR);
                     }else{
-                        //idle somewhere
+                        //idle somewhere indoors
                         if(isUserInCom1()){
 //                            System.out.println("OUTDOOR");
                             classifier.updateActivity(UserActivities.IDLE_COM1);
