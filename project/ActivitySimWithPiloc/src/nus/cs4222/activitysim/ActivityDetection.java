@@ -100,6 +100,7 @@ public class ActivityDetection {
             this.com1FPs.add(next);
         }
         this.classifier = new ActivityClassifier();
+        this.baroSP = new SignalProcessor(200);
 
     }
 
@@ -229,6 +230,8 @@ public class ActivityDetection {
                                           double pressure ,
                                           double altitude ,
                                           int accuracy ) {
+
+        baroSP.update(altitude);
     }
 
     /**
@@ -325,21 +328,21 @@ public class ActivityDetection {
                     double linAccMeanStd = linAccMeanStdEMA.average(linAccMeanSP.getAbsStd());
 //                double linAccMeanStd = linAccMeanSP.getAbsStd();
 //                System.out.println(linAccMeanStd);
-                if(linAccMeanStd >= 0.035){
+                if(baroSP.getStd() >= 1){
                     //bus
 //                    System.out.println("BUS");
                     classifier.updateActivity(UserActivities.BUS);
                 }else{
                     //idle
-                    if(isUserInCom1()){
+                    if(lightSP.getMean() > 2000.0){
                         //idle in com1
 //                        System.out.println("COM1");
-                        classifier.updateActivity(UserActivities.IDLE_COM1);
+                        classifier.updateActivity(UserActivities.IDLE_OUTDOOR);
                     }else{
                         //idle somewhere
-                        if(lightSP.getMean() > 2000.0){
+                        if(isUserInCom1()){
 //                            System.out.println("OUTDOOR");
-                            classifier.updateActivity(UserActivities.IDLE_OUTDOOR);
+                            classifier.updateActivity(UserActivities.IDLE_COM1);
                         }else{
 //                            System.out.println("INDOOR");
                             classifier.updateActivity(UserActivities.IDLE_INDOOR);
@@ -384,12 +387,17 @@ public class ActivityDetection {
 
 
     private boolean isUserInCom1(){
+        int fpDetectedCount = 0;
         for(Fingerprint fp : detectedFPs){
             if(com1FPs.contains(fp.mMac)){
-                return true;
+                fpDetectedCount++;
             }
         }
-        return false;
+        if (fpDetectedCount <= 5) {
+            return false;
+        }else{
+            return true;
+        }
     }
 
     //Signal processor
@@ -405,6 +413,7 @@ public class ActivityDetection {
     private ActivityClassifier classifier;
     private SignalProcessor longPeriodSP;
     private SignalProcessor longPeriodSPStdSP;
+    private SignalProcessor baroSP;
 
     //implements online algo to implement sliding window to calculate mean and std dev.
     //This calculates mean and stddev for 1 variable.
@@ -516,30 +525,31 @@ public class ActivityDetection {
         }
 
         public void updateActivity(UserActivities newState){
-            tries++;
-            if(currentState == newState){
-                currentStateCount++;  
-                return;
-            }   
-            
-            // Change the suggestion if the old one wasn't correct
-            if (newState != suggestedNewState && 
-                    ((float)suggestedNewStateCount/(float)tries) < 0.35) {
-                suggestedNewState = newState;
-                suggestedNewStateCount = 1;
-                tries = 0;
-                return;
-            } else if (newState != suggestedNewState) {
-                return;
-            }
-            
-            // We have to be sure this is the new state
-            if (suggestedNewStateCount < 20 || 
-                    (float)suggestedNewStateCount / (float)tries < 0.7) {
-                suggestedNewStateCount++;
-                return;
-            }
-            
+
+//            tries++;
+//            if(currentState == newState){
+//                currentStateCount++;
+//                return;
+//            }
+//
+//            // Change the suggestion if the old one wasn't correct
+//            if (newState != suggestedNewState &&
+//                    ((float)suggestedNewStateCount/(float)tries) < 0.35) {
+//                suggestedNewState = newState;
+//                suggestedNewStateCount = 1;
+//                tries = 0;
+//                return;
+//            } else if (newState != suggestedNewState) {
+//                return;
+//            }
+//
+//            // We have to be sure this is the new state
+//            if (suggestedNewStateCount < 20 ||
+//                    (float)suggestedNewStateCount / (float)tries < 0.7) {
+//                suggestedNewStateCount++;
+//                return;
+//            }
+//
             switch(newState){
                 case BUS: ActivitySimulator.outputDetectedActivity(UserActivities.BUS); break;
                 case WALKING: ActivitySimulator.outputDetectedActivity(UserActivities.WALKING); break;
@@ -548,10 +558,10 @@ public class ActivityDetection {
                 case IDLE_COM1: ActivitySimulator.outputDetectedActivity(UserActivities.IDLE_COM1); break;
                 default: ActivitySimulator.outputDetectedActivity(UserActivities.INCORRECT); break;
             }
-            
-            suggestedNewState = UserActivities.INCORRECT;
-            suggestedNewStateCount = 0;
-            tries = 0;
+//
+//            suggestedNewState = UserActivities.INCORRECT;
+//            suggestedNewStateCount = 0;
+//            tries = 0;
         }
 
         public void resetStates(){
