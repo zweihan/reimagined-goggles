@@ -19,18 +19,17 @@ for row in gcsv:
 
 ts = list()
 
-baro = list()
-baroema = ema(0.1)
-baroproc = Signalproc(120)
+light = list()
+lightema = ema(0.1)
+lightproc = Signalproc(120)
 baro2 = Signalproc(120)
 i = 0
 for r in fcsv:
-	baroproc.update(baroema.avg(float(r[3])))
 	i+=1
 	if i > 4:
 		ts.append(float(r[1]))
-		baro.append(baroproc.getStd())
+		light.append(float(r[2]))
 
-plt.plot(ts, baro, 'r--')
-plt.axhline(y=0.5)
+plt.plot(ts, light, 'r--')
+plt.axhline(y=1500)
 plt.show()
