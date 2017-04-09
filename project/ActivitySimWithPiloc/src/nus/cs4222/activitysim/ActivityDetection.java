@@ -334,7 +334,7 @@ public class ActivityDetection {
                     classifier.updateActivity(UserActivities.BUS);
                 }else{
                     //idle
-                    if(lightSP.getMean() > 2000.0){
+                    if(lightSP.getMean() >= 1000.0){
                         //idle outdoor somewhere
 //                        System.out.println("COM1");
                         classifier.updateActivity(UserActivities.IDLE_OUTDOOR);
@@ -389,11 +389,13 @@ public class ActivityDetection {
     private boolean isUserInCom1(){
         int fpDetectedCount = 0;
         for(Fingerprint fp : detectedFPs){
-            if(com1FPs.contains(fp.mMac)){
+            if(com1FPs.contains(fp.mMac)
+                    && fp.mRSSI <= 75
+                    ){
                 fpDetectedCount++;
             }
         }
-        if (fpDetectedCount <= 5) {
+        if (fpDetectedCount <= 3) {
             return false;
         }else{
             return true;
