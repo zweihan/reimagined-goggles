@@ -80,16 +80,9 @@ public class ActivityDetection {
         }
         this.windowSize = 350; // ~12 sec
         this.linAccSP = new SignalProcessor[3];
-        this.linAccEMA = new ExponentialMovingAverage[3];
         for(int i = 0; i < 3; i ++){
             linAccSP[i] = new SignalProcessor(windowSize);
-            linAccEMA[i] = new ExponentialMovingAverage(0.05);
         }
-        this.linAccMeanSP = new SignalProcessor(windowSize);
-        this.linAccMeanStdEMA = new ExponentialMovingAverage(0.1);
-        this.avgAbsMeanLinAccEMA = new ExponentialMovingAverage(0.1);
-        this.longPeriodSP = new SignalProcessor(900);
-        this.longPeriodSPStdSP = new SignalProcessor(1800);
         this.lightSP = new SignalProcessor(windowSize);
         this.detectedFPs = new Vector<Fingerprint>();
         File fpListFile = new File("Com1Fingerprints.txt");
@@ -99,6 +92,7 @@ public class ActivityDetection {
             String next = fpIn.next();
             this.com1FPs.add(next);
         }
+        this.avgAbsMeanLinAccEMA = new ExponentialMovingAverage(0.1);
         this.classifier = new ActivityClassifier();
         this.baroSP = new SignalProcessor(200);
         this.baroEMA = new ExponentialMovingAverage(0.5);
@@ -162,9 +156,6 @@ public class ActivityDetection {
         linAccSP[0].update(x);
         linAccSP[1].update(y);
         linAccSP[2].update(z);
-        longPeriodSP.update(Math.abs(x) + Math.abs(y) + Math.abs(z));
-        linAccMeanSP.update(linAccSP[0].getMean() + linAccSP[1].getMean() + linAccSP[2].getMean());
-        longPeriodSPStdSP.update(longPeriodSP.getStd());
         detectActivity();
     }
 
@@ -313,74 +304,32 @@ public class ActivityDetection {
     //method to detect activity
     private void detectActivity(){
         if(linAccSP[0].processedVal >= windowSize && linAccSP[0].processedVal % 60 == 0){
-//            System.out.println(longPeriodSP.findMax());
-//              double avgAbsMeanLinAcc = Math.sqrt((linAccSP[0].getSS() + linAccSP[1].getSS() + linAccSP[2].getSS())/3);
             double avgAbsMeanLinAcc = avgAbsMeanLinAccEMA.average((linAccSP[0].getAbsMean() + linAccSP[1].getAbsMean() + linAccSP[2].getAbsMean()) / 3);
-//            double avgAbsMeanLinAcc = (linAccSP[0].getAbsMean() + linAccSP[1].getAbsMean() + linAccSP[2].getAbsMean()) / 3;
-//              System.out.println(avgAbsMeanLinAcc);
             if(avgAbsMeanLinAcc >= 0.85){
                 //is walking
-//                System.out.println("WALKING");
-//                ActivitySimulator.outputDetectedActivity(UserActivities.WALKING);
                 classifier.updateActivity(UserActivities.WALKING);
 
             }else{
-                    double linAccMeanStd = linAccMeanStdEMA.average(linAccMeanSP.getAbsStd());
-//                double linAccMeanStd = linAccMeanSP.getAbsStd();
-//                System.out.println(linAccMeanStd);
+
                 if(baroSP.getStd() >= 1){
                     //bus
-//                    System.out.println("BUS");
                     classifier.updateActivity(UserActivities.BUS);
                 }else{
                     //idle
                     if(lightSP.getMean() >= 1000.0){
                         //idle outdoor somewhere
-//                        System.out.println("COM1");
                         classifier.updateActivity(UserActivities.IDLE_OUTDOOR);
                     }else{
                         //idle somewhere indoors
                         if(isUserInCom1()){
-//                            System.out.println("OUTDOOR");
                             classifier.updateActivity(UserActivities.IDLE_COM1);
                         }else{
-//                            System.out.println("INDOOR");
                             classifier.updateActivity(UserActivities.IDLE_INDOOR);
                         }
                     }
 
                 }
 
-            }
-        }
-    }
-
-
-    private void detectActivity2(){
-        if(linAccSP[0].processedVal >= windowSize && linAccSP[0].processedVal % 300 == 0) {
-//            System.out.println(longPeriodSP.findMax());
-//              double avgAbsMeanLinAcc = Math.sqrt((linAccSP[0].getSS() + linAccSP[1].getSS() + linAccSP[2].getSS())/3);
-            double mean = avgAbsMeanLinAccEMA.average((linAccSP[0].getAbsMean() + linAccSP[1].getAbsMean() + linAccSP[2].getAbsMean()) / 3);
-            double abstd = linAccMeanStdEMA.average(linAccMeanSP.getAbsStd());
-//            double mean = (linAccSP[0].getAbsMean() + linAccSP[1].getAbsMean() + linAccSP[2].getAbsMean()) / 3;
-//            double abstd = linAccMeanSP.getAbsStd();
-//            double avgAbsMeanLinAcc = (linAccSP[0].getAbsMean() + linAccSP[1].getAbsMean() + linAccSP[2].getAbsMean()) / 3;
-            if(mean <= 0.8353){
-                if(abstd <= 0.0387){
-                    if(isUserInCom1()){
-                        classifier.updateActivity(UserActivities.IDLE_COM1);
-                    }else if(lightSP.getMean() >= 2000.0){
-                        classifier.updateActivity(UserActivities.IDLE_OUTDOOR);
-                    }else{
-                        classifier.updateActivity(UserActivities.IDLE_INDOOR);
-                    }
-                }else{
-                    classifier.updateActivity(UserActivities.BUS);
-                }
-            }else if(mean <= 0.9916 && abstd > 0.2135){
-                classifier.updateActivity(UserActivities.BUS);
-            }else{
-                classifier.updateActivity(UserActivities.WALKING);
             }
         }
     }
@@ -404,19 +353,14 @@ public class ActivityDetection {
 
     //Signal processor
     private SignalProcessor[] linAccSP;
-    private ExponentialMovingAverage[] linAccEMA;
     private SignalProcessor lightSP;
+    private ExponentialMovingAverage avgAbsMeanLinAccEMA;
     private Vector<Fingerprint> detectedFPs;
     private Set<String> com1FPs;
-    private SignalProcessor linAccMeanSP;
     private int windowSize;
-    private ExponentialMovingAverage avgAbsMeanLinAccEMA;
-    private ExponentialMovingAverage linAccMeanStdEMA;
-    private ActivityClassifier classifier;
-    private SignalProcessor longPeriodSP;
-    private SignalProcessor longPeriodSPStdSP;
     private SignalProcessor baroSP;
     private ExponentialMovingAverage baroEMA;
+    private ActivityClassifier classifier;
 
     //implements online algo to implement sliding window to calculate mean and std dev.
     //This calculates mean and stddev for 1 variable.
@@ -512,47 +456,10 @@ public class ActivityDetection {
 
 
     private class ActivityClassifier {
-        public UserActivities currentState;
-        public int currentStateCount;
-        public UserActivities suggestedNewState; // Suggested because we don't know if we 
-                                                 // should switch for sure
-        public int suggestedNewStateCount;
-        public int tries;
 
-        public ActivityClassifier() {
-            this.currentState = UserActivities.INCORRECT;
-            currentStateCount = 0;
-            suggestedNewStateCount = 0;
-            suggestedNewState = UserActivities.INCORRECT;
-            tries = 0;
-        }
 
         public void updateActivity(UserActivities newState){
 
-//            tries++;
-//            if(currentState == newState){
-//                currentStateCount++;
-//                return;
-//            }
-//
-//            // Change the suggestion if the old one wasn't correct
-//            if (newState != suggestedNewState &&
-//                    ((float)suggestedNewStateCount/(float)tries) < 0.35) {
-//                suggestedNewState = newState;
-//                suggestedNewStateCount = 1;
-//                tries = 0;
-//                return;
-//            } else if (newState != suggestedNewState) {
-//                return;
-//            }
-//
-//            // We have to be sure this is the new state
-//            if (suggestedNewStateCount < 20 ||
-//                    (float)suggestedNewStateCount / (float)tries < 0.7) {
-//                suggestedNewStateCount++;
-//                return;
-//            }
-//
             switch(newState){
                 case BUS: ActivitySimulator.outputDetectedActivity(UserActivities.BUS); break;
                 case WALKING: ActivitySimulator.outputDetectedActivity(UserActivities.WALKING); break;
@@ -561,16 +468,9 @@ public class ActivityDetection {
                 case IDLE_COM1: ActivitySimulator.outputDetectedActivity(UserActivities.IDLE_COM1); break;
                 default: ActivitySimulator.outputDetectedActivity(UserActivities.INCORRECT); break;
             }
-//
-//            suggestedNewState = UserActivities.INCORRECT;
-//            suggestedNewStateCount = 0;
-//            tries = 0;
+
         }
 
-        public void resetStates(){
-            this.currentState = UserActivities.INCORRECT;
-            this.currentStateCount = 0;
-        }
     }
 
 }
