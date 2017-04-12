@@ -85,13 +85,8 @@ public class ActivityDetection {
         }
         this.lightSP = new SignalProcessor(windowSize);
         this.detectedFPs = new Vector<Fingerprint>();
-        File fpListFile = new File("Com1Fingerprints.txt");
-        Scanner fpIn = new Scanner(fpListFile);
-        this.com1FPs = new HashSet();
-        while(fpIn.hasNext()){
-            String next = fpIn.next();
-            this.com1FPs.add(next);
-        }
+
+        this.com1FPs = getCom1BaseStations();
         this.avgAbsMeanLinAccEMA = new ExponentialMovingAverage(0.1);
         this.classifier = new ActivityClassifier();
         this.baroSP = new SignalProcessor(200);
@@ -351,6 +346,151 @@ public class ActivityDetection {
         }
     }
 
+    private HashSet<String> getCom1BaseStations(){
+        HashSet<String> baseStations = new HashSet<String>();
+        baseStations.add("a8:9d:21:be:c4:ce");
+        baseStations.add("a8:9d:21:74:0d:93");
+        baseStations.add("a8:9d:21:74:0d:90");
+        baseStations.add("a8:9d:21:74:0d:91");
+        baseStations.add("a8:9d:21:be:c4:ca");
+        baseStations.add("a8:9d:21:f3:86:a9");
+        baseStations.add("a8:9d:21:74:0d:94");
+        baseStations.add("a8:9d:21:74:0d:95");
+        baseStations.add("a8:9d:21:74:0d:98");
+        baseStations.add("a8:9d:21:74:0d:99");
+        baseStations.add("a8:9d:21:82:fe:a9");
+        baseStations.add("74:a2:e6:ec:55:c5");
+        baseStations.add("74:a2:e6:ec:55:c7");
+        baseStations.add("a8:9d:21:be:c4:cf");
+        baseStations.add("74:a2:e6:ec:55:c1");
+        baseStations.add("74:a2:e6:ec:55:c0");
+        baseStations.add("a8:9d:21:f3:70:88");
+        baseStations.add("a8:9d:21:f3:70:89");
+        baseStations.add("84:b8:02:00:3b:be");
+        baseStations.add("84:b8:02:00:3b:bf");
+        baseStations.add("bc:f1:f2:22:94:8a");
+        baseStations.add("74:a2:e6:ec:55:c9");
+        baseStations.add("84:b8:02:00:3b:ba");
+        baseStations.add("84:b8:02:00:3b:bb");
+        baseStations.add("a8:9d:21:74:0d:97");
+        baseStations.add("a8:9d:21:be:c2:79");
+        baseStations.add("88:f0:31:8f:d8:de");
+        baseStations.add("a8:9d:21:0f:7e:8c");
+        baseStations.add("bc:f1:f2:22:94:8f");
+        baseStations.add("a8:9d:21:0f:7e:8b");
+        baseStations.add("b0:aa:77:ad:c3:0a");
+        baseStations.add("b0:aa:77:ad:c3:0b");
+        baseStations.add("a8:9d:21:0f:7e:8a");
+        baseStations.add("a8:9d:21:0f:7e:8f");
+        baseStations.add("b0:aa:77:ad:c3:0e");
+        baseStations.add("b0:aa:77:ad:c3:0f");
+        baseStations.add("a8:9d:21:0f:7e:8e");
+        baseStations.add("88:f0:31:91:ca:09");
+        baseStations.add("bc:f1:f2:22:94:8c");
+        baseStations.add("bc:f1:f2:22:9c:4f");
+        baseStations.add("74:a2:e6:ec:55:ce");
+        baseStations.add("74:a2:e6:ec:55:cf");
+        baseStations.add("74:a2:e6:ec:55:ca");
+        baseStations.add("84:b8:02:00:3b:b9");
+        baseStations.add("74:a2:e6:ec:55:cc");
+        baseStations.add("74:a2:e6:ec:55:cb");
+        baseStations.add("a8:9d:21:f3:70:8f");
+        baseStations.add("84:b8:02:00:3b:b5");
+        baseStations.add("88:f0:31:8f:d8:d7");
+        baseStations.add("84:b8:02:00:3b:b7");
+        baseStations.add("84:b8:02:00:3b:b0");
+        baseStations.add("84:b8:02:00:3b:b1");
+        baseStations.add("84:b8:02:00:3b:b3");
+        baseStations.add("a8:9d:21:74:0d:9b");
+        baseStations.add("a8:9d:21:74:0d:9c");
+        baseStations.add("a8:9d:21:74:0d:9a");
+        baseStations.add("a8:9d:21:74:0d:9f");
+        baseStations.add("a8:9d:21:74:0d:9e");
+        baseStations.add("a8:9d:21:f3:86:ae");
+        baseStations.add("a8:9d:21:be:c4:c9");
+        baseStations.add("a8:9d:21:f3:86:aa");
+        baseStations.add("88:f0:31:8d:1c:2f");
+        baseStations.add("a8:9d:21:0f:7e:80");
+        baseStations.add("a8:9d:21:0f:7e:81");
+        baseStations.add("a8:9d:21:0f:7e:87");
+        baseStations.add("a8:9d:21:0f:7e:84");
+        baseStations.add("b0:aa:77:ad:c3:09");
+        baseStations.add("a8:9d:21:0f:7e:88");
+        baseStations.add("a8:9d:21:0f:7e:89");
+        baseStations.add("a8:9d:21:f3:87:23");
+        baseStations.add("bc:f1:f2:22:be:0e");
+        baseStations.add("a8:9d:21:be:c2:7f");
+        baseStations.add("a8:9d:21:be:c2:7e");
+        baseStations.add("a8:9d:21:74:0b:2e");
+        baseStations.add("a8:9d:21:74:0b:2f");
+        baseStations.add("a8:9d:21:74:0b:2a");
+        baseStations.add("a8:9d:21:74:0b:2c");
+        baseStations.add("a8:9d:21:74:0b:2b");
+        baseStations.add("a8:9d:21:be:c0:95");
+        baseStations.add("bc:f1:f2:22:94:89");
+        baseStations.add("a8:9d:21:be:c0:93");
+        baseStations.add("a8:9d:21:be:c0:91");
+        baseStations.add("a8:9d:21:be:c0:90");
+        baseStations.add("a8:9d:21:f3:70:87");
+        baseStations.add("a8:9d:21:f3:70:84");
+        baseStations.add("a8:9d:21:be:c0:99");
+        baseStations.add("a8:9d:21:f3:6f:bf");
+        baseStations.add("a8:9d:21:f3:87:29");
+        baseStations.add("a8:9d:21:82:fe:a0");
+        baseStations.add("a8:9d:21:82:fe:a1");
+        baseStations.add("a8:9d:21:82:fe:a3");
+        baseStations.add("00:3a:7d:3d:6f:5b");
+        baseStations.add("84:b8:02:00:3a:1a");
+        baseStations.add("a8:9d:21:f3:87:20");
+        baseStations.add("00:3a:7d:3d:6f:5a");
+        baseStations.add("00:3a:7d:3d:6f:5f");
+        baseStations.add("a8:9d:21:f3:87:27");
+        baseStations.add("00:3a:7d:3d:6f:5e");
+        baseStations.add("a8:9d:21:f3:87:21");
+        baseStations.add("88:f0:31:8f:d8:dc");
+        baseStations.add("88:f0:31:91:ca:0f");
+        baseStations.add("88:f0:31:8d:1c:29");
+        baseStations.add("84:b8:02:00:3b:bc");
+        baseStations.add("88:f0:31:91:ca:0b");
+        baseStations.add("88:f0:31:91:ca:0a");
+        baseStations.add("a8:9d:21:be:c0:9f");
+        baseStations.add("a8:9d:21:be:c0:9e");
+        baseStations.add("a8:9d:21:f3:70:8e");
+        baseStations.add("a8:9d:21:be:c0:9c");
+        baseStations.add("a8:9d:21:be:c0:9b");
+        baseStations.add("a8:9d:21:be:c0:9a");
+        baseStations.add("a8:9d:21:f3:70:8b");
+        baseStations.add("a8:9d:21:f3:70:8c");
+        baseStations.add("a8:9d:21:74:0b:25");
+        baseStations.add("a8:9d:21:74:0b:24");
+        baseStations.add("a8:9d:21:74:0b:27");
+        baseStations.add("a8:9d:21:82:fe:a7");
+        baseStations.add("a8:9d:21:74:0b:21");
+        baseStations.add("a8:9d:21:74:0b:20");
+        baseStations.add("a8:9d:21:f3:70:80");
+        baseStations.add("88:f0:31:8f:d8:d9");
+        baseStations.add("a8:9d:21:f3:70:8a");
+        baseStations.add("a8:9d:21:74:0b:29");
+        baseStations.add("a8:9d:21:74:0b:28");
+        baseStations.add("84:b8:02:00:3a:19");
+        baseStations.add("a8:9d:21:f3:70:81");
+        baseStations.add("88:f0:31:8d:1c:2e");
+        baseStations.add("84:b8:02:00:3a:1e");
+        baseStations.add("88:f0:31:91:ca:0e");
+        baseStations.add("bc:f1:f2:22:94:8e");
+        baseStations.add("a8:9d:21:82:fe:ae");
+        baseStations.add("a8:9d:21:82:fe:af");
+        baseStations.add("00:3a:7d:3d:6f:59");
+        baseStations.add("a8:9d:21:82:fe:aa");
+        baseStations.add("a8:9d:21:82:fe:ab");
+        baseStations.add("a8:9d:21:82:fe:ac");
+        baseStations.add("1c:af:f7:87:24:70");
+        baseStations.add("a8:9d:21:f3:87:2f");
+        baseStations.add("00:3a:7d:3d:6f:57");
+        baseStations.add("a8:9d:21:f3:87:2e");
+        return baseStations;
+    }
+
     //Signal processor
     private SignalProcessor[] linAccSP;
     private SignalProcessor lightSP;
@@ -414,23 +554,27 @@ public class ActivityDetection {
         }
 
         public double getMean(){
-            return sum / windowSize;
+            int ws = this.windowSize < this.processedVal ? this.windowSize : this.processedVal;
+            return sum / ws;
         }
 
         public double getStd(){
             // VAR(X) = E(X^2) - E(x)^2
-            double mean = sum/windowSize;
-            return Math.sqrt(sumOfSquares/windowSize - mean * mean);
+            int ws = this.windowSize < this.processedVal ? this.windowSize : this.processedVal;
+            double mean = sum/ws;
+            return Math.sqrt(sumOfSquares/ws - mean * mean);
         }
 
         public double getAbsMean(){
-            return abssum / windowSize;
+            int ws = this.windowSize < this.processedVal ? this.windowSize : this.processedVal;
+            return abssum / ws;
         }
 
         public double getAbsStd(){
-            double mean = abssum / windowSize;
+            int ws = this.windowSize < this.processedVal ? this.windowSize : this.processedVal;
+            double mean = abssum / ws;
             //VAR(X) = E(X^2) - E(X)^2
-            return Math.sqrt(sumOfSquares / windowSize - mean * mean);
+            return Math.sqrt(sumOfSquares / ws - mean * mean);
         }
     }
 
