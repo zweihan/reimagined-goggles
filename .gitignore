@@ -17,9 +17,14 @@ project/SensorLogAppWithPiloc/.gradle/*
 project/SensorLogAppWithPiloc/.idea/*
 project/SensorLogAppWithPiloc/build/*
 
-project/SensorLogAppWithPiloc/gradle/*
+project/ActivitySimWithPiloc/gradle/*
 project/ActivitySimWithPiloc/build/*
 project/ActivitySimWithPiloc/.idea/*
 
 project/ActivityEval/build/*
 project/ActivityEval/.idea/*
+
+project/ActivityTrackAppWithPiloc/.gradle/*
+project/ActivityTrackAppWithPiloc/gradle/*
+project/ActivityTrackAppWithPiloc/build/*
+project/ActivityTrackAppWithPiloc/.idea/*
